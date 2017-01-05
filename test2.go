@@ -264,7 +264,7 @@ func (rot rot13Reader) Read(b []byte) (int, error)  {
 
 
 }
-// 这个练习不清楚需要怎么作
+
 func x_section10() {
     s := strings.NewReader("Lbh penpxrq gur pbqr!")
     r := rot13Reader{s}
@@ -292,13 +292,62 @@ func x_section11() {
 
 }
 
+
+type httpString string
+type httpStruct struct {
+    Greeting string
+    Punct string
+    Who string
+}
+
+func (h httpString) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+    b := make([]byte, len(h))
+    for i:=0; i< len(h); i++ {
+        b[i] = h[i]
+    }
+    w.Write(b)
+
+    fmt.Println(h, r.Method)
+}
+
+func (s httpStruct) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+
+    response := fmt.Sprintf("%s!, I am %s", s.Greeting, s.Who)
+    b := make([]byte, len(response))
+    for i:=0; i< len(response); i++ {
+        b[i] = response[i]
+    }
+    w.Write(b)
+    fmt.Printf("%s, %s, %s", s.Greeting, s.Punct, s.Who)
+    fmt.Println(r.Method)
+}
+
+func x_section12() {
+    var h1 httpString = "I'm a frayed knot."
+    var h2 httpStruct = httpStruct{"Hello", ":", "Gophers!"}
+
+    listen := http.NewServeMux()
+    listen.Handle("/string", h1)
+    listen.Handle("/struct", &h2)
+
+    err := http.ListenAndServe("localhost:4000", listen)
+
+    if err != nil {
+        log.Fatal(err)
+    }
+
+
+}
+
+
 func main()  {
 
     //x_section9()
     //x_section11()
 
-    x_section10()
+    //x_section10()
 
+    x_section12()
 
 
 }
